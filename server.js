@@ -1,12 +1,12 @@
-// Baris paling atas mencetak identitas kelompok
-console.log("==========================================");
-console.log("KELOMPOK: [Nomor Kelompok]");
+console.log("=============================================");
+console.log("KELOMPOK: 4");
 console.log("ANGGOTA:");
-console.log("1. Moh Akbar Nusantara (F5512520037)");
-console.log("2. [Nama Anggota 2] ([NIM])");
-console.log("3. [Nama Anggota 3] ([NIM])");
-console.log("4. [Nama Anggota 4] ([NIM])");
-console.log("==========================================");
+console.log("1. Moh Akbar Nusantara        || F5512520037");
+console.log("2. HUMAIRA ISLAMI RISYA ADAM  || F5512510006");
+console.log("3. BAGUS ALDY PUTRA           || F5512510009");
+console.log("4. ANDHIN ANGGRAINI BANTULU   || F5512510010");
+console.log("5. CUT SAFIRA                 || F5512510022");
+console.log("=============================================");
 
 const http = require('http');
 const fs = require('fs');
