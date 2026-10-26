@@ -45,7 +45,6 @@ const server = http.createServer((req, res) => {
         const books = readData();
         const id = reqUrl.searchParams.get('id');
 
-        // GET /books?id={id} -> Cari detail 1 buku
         if (id) {
             const book = books.find(b => b.id === id);
             if (book) {
@@ -57,13 +56,12 @@ const server = http.createServer((req, res) => {
             }
         }
 
-        // GET /books -> Tampilkan semua data buku
         res.writeHead(200);
         return res.end(JSON.stringify({ status: 'success', data: books }));
     }
 
     // 2. ROUTER: POST /books (Tambah buku baru + Integrasi Public API)
-    if (pathname === '/books' && method === 'POST') {
+    else if (pathname === '/books' && method === 'POST') {
         let body = '';
         
         req.on('data', chunk => {
@@ -74,7 +72,6 @@ const server = http.createServer((req, res) => {
             try {
                 const { isbn, stok, kategori } = JSON.parse(body);
 
-                // Validasi Input (400 Bad Request)
                 if (!isbn || stok === undefined || !kategori) {
                     res.writeHead(400);
                     return res.end(JSON.stringify({ 
@@ -83,7 +80,6 @@ const server = http.createServer((req, res) => {
                     }));
                 }
 
-                // Panggil Public API Open Library dari Sisi Server
                 const apiUrl = `https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`;
 
                 https.get(apiUrl, (apiRes) => {
@@ -92,7 +88,9 @@ const server = http.createServer((req, res) => {
                     apiRes.on('data', chunk => { apiData += chunk; });
 
                     apiRes.on('end', () => {
-                        const parsedApi = JSON.parse(apiData);
+                        let parsedApi = {};
+                        try { parsedApi = JSON.parse(apiData); } catch (e) {}
+                        
                         const bookKey = `ISBN:${isbn}`;
 
                         if (!parsedApi[bookKey]) {
@@ -106,7 +104,6 @@ const server = http.createServer((req, res) => {
                         const externalData = parsedApi[bookKey];
                         const books = readData();
 
-                        // Gabungkan Data Input Lokal + Data dari Public API
                         const newBook = {
                             id: (books.length + 1).toString(),
                             isbn: isbn,
@@ -120,9 +117,8 @@ const server = http.createServer((req, res) => {
                         books.push(newBook);
                         writeData(books);
 
-                        // Respon Berhasil (201 Created)
                         res.writeHead(201);
-                        res.end(JSON.stringify({
+                        return res.end(JSON.stringify({
                             status: 'success',
                             message: 'Buku berhasil ditambahkan dan diperkaya dari Open Library API',
                             data: newBook
@@ -131,23 +127,20 @@ const server = http.createServer((req, res) => {
 
                 }).on('error', (err) => {
                     res.writeHead(500);
-                    res.end(JSON.stringify({ status: 'error', message: 'Gagal menghubungi Open Library API' }));
+                    return res.end(JSON.stringify({ status: 'error', message: 'Gagal menghubungi Open Library API' }));
                 });
 
             } catch (err) {
                 res.writeHead(400);
-                res.end(JSON.stringify({ status: 'fail', message: 'Format JSON body tidak valid' }));
+                return res.end(JSON.stringify({ status: 'fail', message: 'Format JSON body tidak valid' }));
             }
         });
+
         return;
     }
 
-    // Endpoint yang tidak terdaftar (Default Fallback)
-    res.writeHead(404);
-    res.end(JSON.stringify({ status: 'fail', message: 'Endpoint tidak ditemukan' }));
-    
     // 3. ROUTER: PUT /books?id={id} (Update Stok atau Kategori Buku)
-    if (pathname === '/books' && method === 'PUT') {
+    else if (pathname === '/books' && method === 'PUT') {
         const id = reqUrl.searchParams.get('id');
 
         if (!id) {
@@ -169,28 +162,28 @@ const server = http.createServer((req, res) => {
                     return res.end(JSON.stringify({ status: 'fail', message: 'Buku dengan ID tersebut tidak ditemukan' }));
                 }
 
-                // Update data jika field dikirim
                 if (stok !== undefined) books[bookIndex].stok = Number(stok);
                 if (kategori !== undefined) books[bookIndex].kategori = kategori;
 
                 writeData(books);
 
                 res.writeHead(200);
-                res.end(JSON.stringify({
+                return res.end(JSON.stringify({
                     status: 'success',
                     message: 'Data buku berhasil diperbarui',
                     data: books[bookIndex]
                 }));
             } catch (err) {
                 res.writeHead(400);
-                res.end(JSON.stringify({ status: 'fail', message: 'Format JSON body tidak valid' }));
+                return res.end(JSON.stringify({ status: 'fail', message: 'Format JSON body tidak valid' }));
             }
         });
+
         return;
     }
 
     // 4. ROUTER: DELETE /books?id={id} (Hapus Buku)
-    if (pathname === '/books' && method === 'DELETE') {
+    else if (pathname === '/books' && method === 'DELETE') {
         const id = reqUrl.searchParams.get('id');
 
         if (!id) {
@@ -206,7 +199,6 @@ const server = http.createServer((req, res) => {
             return res.end(JSON.stringify({ status: 'fail', message: 'Buku dengan ID tersebut tidak ditemukan' }));
         }
 
-        // Hapus dari array
         const deletedBook = books.splice(bookIndex, 1)[0];
         writeData(books);
 
@@ -216,6 +208,12 @@ const server = http.createServer((req, res) => {
             message: 'Buku berhasil dihapus dari sistem',
             data: deletedBook
         }));
+    }
+
+    // 5. FALLBACK: Endpoint Tidak Ditemukan
+    else {
+        res.writeHead(404);
+        return res.end(JSON.stringify({ status: 'fail', message: 'Endpoint tidak ditemukan' }));
     }
 });
 
