@@ -8,7 +8,7 @@ Aplikasi pengelolaan katalog buku berbasis RESTful API menggunakan core module N
 
 | No | Nama Anggota | NIM |
 |---|---|---|
-| 1 | Moh Akbar Nusantara | F5512520037 |
+| 1 | MOH AKBAR NUSANTARA | F5512520037 |
 | 2 | HUMAIRA ISLAMI RISYA ADAM | F5512510006 |
 | 3 | BAGUS ALDY PUTRA | F5512510009 |
 | 4 | ANDHIN ANGGRAINI BANTULU | F5512510010 |

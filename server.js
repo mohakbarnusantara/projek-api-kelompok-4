@@ -1,7 +1,7 @@
 console.log("=============================================");
 console.log("KELOMPOK: 4");
 console.log("ANGGOTA:");
-console.log("1. Moh Akbar Nusantara        || F5512520037");
+console.log("1. MOH AKBAR NUSANTARA        || F5512520037");
 console.log("2. HUMAIRA ISLAMI RISYA ADAM  || F5512510006");
 console.log("3. BAGUS ALDY PUTRA           || F5512510009");
 console.log("4. ANDHIN ANGGRAINI BANTULU   || F5512510010");
