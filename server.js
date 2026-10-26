@@ -145,6 +145,78 @@ const server = http.createServer((req, res) => {
     // Endpoint yang tidak terdaftar (Default Fallback)
     res.writeHead(404);
     res.end(JSON.stringify({ status: 'fail', message: 'Endpoint tidak ditemukan' }));
+    
+    // 3. ROUTER: PUT /books?id={id} (Update Stok atau Kategori Buku)
+    if (pathname === '/books' && method === 'PUT') {
+        const id = reqUrl.searchParams.get('id');
+
+        if (!id) {
+            res.writeHead(400);
+            return res.end(JSON.stringify({ status: 'fail', message: 'Query parameter id wajib disertakan!' }));
+        }
+
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+
+        req.on('end', () => {
+            try {
+                const { stok, kategori } = JSON.parse(body);
+                const books = readData();
+                const bookIndex = books.findIndex(b => b.id === id);
+
+                if (bookIndex === -1) {
+                    res.writeHead(404);
+                    return res.end(JSON.stringify({ status: 'fail', message: 'Buku dengan ID tersebut tidak ditemukan' }));
+                }
+
+                // Update data jika field dikirim
+                if (stok !== undefined) books[bookIndex].stok = Number(stok);
+                if (kategori !== undefined) books[bookIndex].kategori = kategori;
+
+                writeData(books);
+
+                res.writeHead(200);
+                res.end(JSON.stringify({
+                    status: 'success',
+                    message: 'Data buku berhasil diperbarui',
+                    data: books[bookIndex]
+                }));
+            } catch (err) {
+                res.writeHead(400);
+                res.end(JSON.stringify({ status: 'fail', message: 'Format JSON body tidak valid' }));
+            }
+        });
+        return;
+    }
+
+    // 4. ROUTER: DELETE /books?id={id} (Hapus Buku)
+    if (pathname === '/books' && method === 'DELETE') {
+        const id = reqUrl.searchParams.get('id');
+
+        if (!id) {
+            res.writeHead(400);
+            return res.end(JSON.stringify({ status: 'fail', message: 'Query parameter id wajib disertakan!' }));
+        }
+
+        const books = readData();
+        const bookIndex = books.findIndex(b => b.id === id);
+
+        if (bookIndex === -1) {
+            res.writeHead(404);
+            return res.end(JSON.stringify({ status: 'fail', message: 'Buku dengan ID tersebut tidak ditemukan' }));
+        }
+
+        // Hapus dari array
+        const deletedBook = books.splice(bookIndex, 1)[0];
+        writeData(books);
+
+        res.writeHead(200);
+        return res.end(JSON.stringify({
+            status: 'success',
+            message: 'Buku berhasil dihapus dari sistem',
+            data: deletedBook
+        }));
+    }
 });
 
 server.listen(PORT, () => {

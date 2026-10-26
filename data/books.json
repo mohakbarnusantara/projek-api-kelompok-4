@@ -1,0 +1,11 @@
+[
+  {
+    "id": "1",
+    "isbn": "9780261102217",
+    "title": "The Hobbit",
+    "authors": "J.R.R. Tolkien",
+    "publish_date": "2009",
+    "stok": 10,
+    "kategori": "Fantasy"
+  }
+]
