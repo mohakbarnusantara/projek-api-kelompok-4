@@ -2,59 +2,69 @@
 
 Aplikasi pengelolaan katalog buku berbasis RESTful API menggunakan core module Node.js (`http`, `fs`, `https`) tanpa framework. Aplikasi ini mengintegrasikan data lokal dengan Public API dari Open Library untuk pengayaan metadata buku secara otomatis.
 
----
-
-## Kelompok 4
+## 👥 Kelompok 4
 
 | No | Nama Anggota | NIM |
-|---|---|---|
-| 1 | MOH AKBAR NUSANTARA | F5512520037 |
+| ----- | ----- | ----- |
+| 1 | Moh Akbar Nusantara | F5512520037 |
 | 2 | HUMAIRA ISLAMI RISYA ADAM | F5512510006 |
 | 3 | BAGUS ALDY PUTRA | F5512510009 |
 | 4 | ANDHIN ANGGRAINI BANTULU | F5512510010 |
 | 5 | CUT SAFIRA | F5512510022 |
 
----
+## 🌐 Integrasi Public API Eksternal
 
-## Deskripsi Sistem & Arsitektur
+* **Nama Public API:** Open Library Books API
+* **Base Endpoint:** `https://openlibrary.org/api/books`
+* **Format URL Request:** `https://openlibrary.org/api/books?bibkeys=ISBN:{isbn}&format=json&jscmd=data`
+* **Field Data yang Diambil:**
+  * `title` : Judul buku
+  * `authors` : Nama penulis / pengarang
+  * `publish_date` : Tanggal atau tahun terbit
+* **Mekanisme Integrasi:**
+  Saat *client* melakukan penambahan buku melalui `POST /books` dengan mengirimkan data ISBN, `stok`, dan `kategori`, server backend secara otomatis memanggil Open Library API di sisi server. Data metadata (`title`, `authors`, `publish_date`) ditarik dari Open Library API dan digabungkan dengan data input *client* sebelum disimpan secara permanen ke file `data/books.json`.
+
+## 🛠️ Deskripsi Sistem & Arsitektur
 
 Sistem ini terdiri dari dua aplikasi terpisah:
+
 1. **API Server (`server.js`)**: Server HTTP murni menggunakan module `http`. Server bertindak sebagai **API Provider** (melayani request client) sekaligus **API Consumer** (mengambil metadata buku dari Open Library API).
 2. **Client Console (`client.js`)**: Aplikasi CLI berbasis terminal yang berinteraksi langsung dengan API Server melalui protokol HTTP.
 
----
-
-## Endpoint API
+## 📌 Endpoint API
 
 | Method | Endpoint | Deskripsi | Status Code |
-|---|---|---|---|
+| ----- | ----- | ----- | ----- |
 | `GET` | `/books` | Menampilkan seluruh daftar buku | `200 OK` |
 | `GET` | `/books?id={id}` | Menampilkan detail 1 buku berdasarkan ID | `200 OK`, `404 Not Found` |
 | `POST` | `/books` | Menambah buku baru via ISBN & mengambil metadata dari Open Library API | `201 Created`, `400 Bad Request`, `404 Not Found` |
 | `PUT` | `/books?id={id}` | Mengubah stok atau kategori buku | `200 OK`, `400 Bad Request`, `404 Not Found` |
 | `DELETE` | `/books?id={id}` | Menghapus buku dari sistem simpanan | `200 OK`, `400 Bad Request`, `404 Not Found` |
 
----
-
-## Cara Menjalankan Aplikasi
+## 🚀 Cara Menjalankan Aplikasi
 
 ### 1. Jalankan API Server
+
 Buka terminal pertama dan jalankan:
+
 ```bash
 node server.js
 ```
+
 *Identitas kelompok akan otomatis dicetak pada baris paling atas terminal.*
 
 ### 2. Jalankan Client Console
+
 Buka terminal kedua (terpisah) dan jalankan:
+
 ```bash
 node client.js
 ```
+
 Pilih opsi menu 0-5 untuk menjalankan operasi CRUD secara interaktif.
 
----
+## 📂 Struktur File
 
-## Struktur File
 ```text
 katalog-buku-api/
 ├── server.js         # RESTful API Server
@@ -62,4 +72,5 @@ katalog-buku-api/
 ├── data/
 │   └── books.json    # Media penyimpanan JSON
 ├── README.md         # Dokumentasi proyek
+└── .gitignore        # Ignored files
 ```
